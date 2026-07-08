@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ramaswami Kirana Mart</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f7f9fc;
+            color: #333;
+        }
+
+        header {
+            background-color: #f5de3b;
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1c1c1c;
+            line-height: 1.2;
+        }
+
+        .owner-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #444;
+            margin-top: 2px;
+        }
+
+        .cart-icon {
+            font-size: 18px;
+            font-weight: bold;
+            background: #1c1c1c;
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .search-container {
+            display: flex;
+            margin-bottom: 25px;
+            gap: 10px;
+            max-width: 500px;
+        }
+
+        .search-input {
+            flex-grow: 1;
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: #f5de3b;
+        }
+
+        .search-btn {
+            background-color: #1c1c1c;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .search-btn:hover {
+            background-color: #333;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #222;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: #fff;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 10px 0 5px 0;
+            color: #000;
+        }
+
+        .weight-custom-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 12px;
+        }
+
+        .weight-input {
+            width: 70px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            text-align: center;
+        }
+
+        .weight-unit-label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .product-price {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .add-btn {
+            background-color: #27af47;
+            color: white;
+            border: none;
+            padding: 8px 0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .add-btn:hover {
+            background-color: #1e8a35;
+        }
+
+        .cart-sidebar {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            width: 350px;
+            height: 100%;
+            background: white;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            transition: 0.3s;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            z-index: 101;
+        }
+
+        .cart-sidebar.active {
+            right: 0;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+        .close-cart {
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .cart-items {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .remove-item-btn {
+            background: none;
+            border: none;
+            color: #ff3333;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 10px;
+            padding: 0 5px;
+        }
+
+        .remove-item-btn:hover {
+            color: #b30000;
+        }
+
+        .clear-cart-btn {
+            background-color: #777;
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        .clear-cart-btn:hover {
+            background-color: #555;
+        }
+
+        .customer-details-form {
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .customer-details-form h4 {
+            margin-bottom: 10px;
+            font-size: 15px;
+            color: #1c1c1c;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: #27af47;
+        }
+
+        textarea.form-input {
+            resize: none;
+            height: 60px;
+        }
+
+        .cart-total {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .error-box {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 12px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+        }
+
+        .checkout-btn {
+            background-color: #25d366;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .checkout-btn:hover {
+            background-color: #128c7e;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <div class="logo">Ramaswami Kirana Mart</div>
+            <div class="owner-name">Owner : Prabhakar .R. Chilka
+            Mo.7020444707</div>
+        </div>
+        <div class="cart-icon" onclick="toggleCart()">Cart (<span id="cart-count">0</span>)</div>
+    </header>
+
+    <div class="container">
+        <div class="search-container">
+            <input type="text" id="search-input" class="search-input" placeholder="Search products...">
+            <button class="search-btn" onclick="filterProducts()">Search</button>
+        </div>
+
+        <h2>Fresh Products</h2>
+        <div class="products-grid" id="products-container"></div>
+    </div>
+
+    <div class="cart-sidebar" id="cart-sidebar">
+        <div class="cart-header">
+            <h3>Your Cart</h3>
+            <span class="close-cart" onclick="toggleCart()">&times;</span>
+        </div>
+        
+        <div class="cart-items" id="cart-items"></div>
+
+        <button class="clear-cart-btn" onclick="clearAllCart()">Clear Full Cart</button>
+
+        <div class="customer-details-form">
+            <h4>Delivery Details</h4>
+            <div class="form-group">
+                <input type="text" id="cust-name" class="form-input" placeholder="Your Name (तुमचे नाव)" required>
+            </div>
+            <div class="form-group">
+                <textarea id="cust-address" class="form-input" placeholder="Delivery Address (तुमचा पत्ता)" required></textarea>
+            </div>
+        </div>
+
+        <div class="cart-total">
+            <span>Total:</span>
+            <span>₹<span id="cart-total-amount">0</span></span>
+        </div>
+        
+        <div class="error-box" id="error-box">
+            bill should be above 500rs for home delivery....
+        </div>
+
+        <button class="checkout-btn" onclick="sendOrderToWhatsApp()">Order via WhatsApp</button>
+    </div>
+
+    <script>
+        const WHATSAPP_NUMBER = "7020444707"; 
+
+        const products = [
+            { id: 1, name: "L M तांदूळ (L M Rice)", baseWeight: 1, unit: "kg", basePrice: 58 },
+            { id: 2, name: "टॉपार तूरडाळ (Toor Dal)", baseWeight: 1, unit: "kg", basePrice: 140 },
+            { id: 3, name: "साखर (Sugar)", baseWeight: 1, unit: "kg", basePrice: 46 },
+            { id: 4, name: "पोहा (Poha)", baseWeight: 1, unit: "kg", basePrice: 60 },
+            { id: 5, name: "रवा (Rava)", baseWeight: 1, unit: "kg", basePrice: 48 },
+            { id: 6, name: "लापसी रवा (Lapsi Rava)", baseWeight: 1, unit: "kg", basePrice: 48 },
+            { id: 7, name: "मुगडाळ (Moong Dal)", baseWeight: 1, unit: "kg", basePrice: 140 },
+            { id: 8, name: "उडीद डाळ (Urad Dal)", baseWeight: 1, unit: "kg", basePrice: 140 },
+            { id: 9, name: "चना डाळ (Chana Dal)", baseWeight: 1, unit: "kg", basePrice: 100 },
+            { id: 10, name: "मैदा (Maida)", baseWeight: 1, unit: "kg", basePrice: 48 },
+            { id: 11, name: "पोळीचे पीठ (Wheat Flour / Atta)", baseWeight: 1, unit: "kg", basePrice: 48 },
+            { id: 12, name: "शाबुदाणा (Sabudana)", baseWeight: 1, unit: "kg", basePrice: 70 },
+            { id: 13, name: "शेंगा भाजके (Roasted Peanuts)", baseWeight: 1, unit: "kg", basePrice: 160 },
+            { id: 14, name: "शेंगा कच्चे घुंगरू (Raw Peanuts)", baseWeight: 1, unit: "kg", basePrice: 160 },
+            { id: 15, name: "हळद (Turmeric)", baseWeight: 1, unit: "kg", basePrice: 300 },
+            { id: 16, name: "लाल मिरची (Red Chilli)", baseWeight: 1, unit: "kg", basePrice: 225 },
+            { id: 17, name: "धने पावडर (Coriander Powder)", baseWeight: 50, unit: "g", basePrice: 10 },
+            { id: 18, name: "धने (Coriander Seeds)", baseWeight: 1, unit: "kg", basePrice: 160 },
+            { id: 19, name: "लवंग (Cloves)", baseWeight: 50, unit: "g", basePrice: 65 },
+            { id: 20, name: "इलायची (Cardamom)", baseWeight: 50, unit: "g", basePrice: 200 },
+            { id: 21, name: "फुटाणे (Roasted Chana)", baseWeight: 1, unit: "kg", basePrice: 120 },
+            { id: 22, name: "जिरे (Cumin Seeds)", baseWeight: 50, unit: "g", basePrice: 20 },
+            { id: 23, name: "मोहरी (Mustard Seeds)", baseWeight: 50, unit: "g", basePrice: 7 },
+            { id: 24, name: "मेथी / मेंथुल (Fenugreek Seeds)", baseWeight: 50, unit: "g", basePrice: 10 },
+            { id: 25, name: "टाटा मीठ (Tata Salt)", baseWeight: 1, unit: "kg", basePrice: 30 },
+            { id: 26, name: "सादा मीठ (Regular Salt)", baseWeight: 1, unit: "kg", basePrice: 12 },
+            { id: 27, name: "जाड मीठ (Crystal Salt)", baseWeight: 1, unit: "kg", basePrice: 12 },
+            { id: 28, name: "रुची गोल्ड तेल (Ruchi Gold Oil)", baseWeight: 1, unit: "Pkt", basePrice: 135 },
+            { id: 29, name: "सोयाबीन तेल रोहिणी (Soyabean Oil Rohini)", baseWeight: 1, unit: "kg", basePrice: 170 },
+            { id: 30, name: "आटा समृद्धी (Atta Samriddhi)", baseWeight: 1, unit: "kg", basePrice: 46 },
+            { id: 31, name: "गूळ (Jaggery)", baseWeight: 1, unit: "kg", basePrice: 64 },
+            { id: 32, name: "मसूर डाळ (Masoor Dal)", baseWeight: 1, unit: "kg", basePrice: 100 },
+            { id: 33, name: "हिरा बेसन (Hira Besan)", baseWeight: 1, unit: "kg", basePrice: 120 },
+            { id: 34, name: "मिठ (Salt)", baseWeight: 1, unit: "kg", basePrice: 10 },
+            { id: 35, name: "दालचिनी (Cinnamon)", baseWeight: 50, unit: "g", basePrice: 40 },
+            { id: 36, name: "मिरे / मिराळ (Black Pepper)", baseWeight: 50, unit: "g", basePrice: 50 },
+            { id: 37, name: "चक्रफुल (Star Anise)", baseWeight: 50, unit: "g", basePrice: 100 },
+            { id: 38, name: "बडीशोप (Fennel Seeds)", baseWeight: 50, unit: "g", basePrice: 25 },
+            { id: 39, name: "भगर (Bhagar)", baseWeight: 1, unit: "kg", basePrice: 160 },
+            { id: 40, name: "मिल्कमेकर मिडियम (Soya Chunks Medium)", baseWeight: 1, unit: "kg", basePrice: 120 },
+            { id: 41, name: "मिल्कमेकर चुरा (Soya Chunks Crushed)", baseWeight: 1, unit: "kg", basePrice: 120 },
+            { id: 42, name: "गहू अजंठा (Ajantha Wheat)", baseWeight: 1, unit: "kg", basePrice: 45 },
+            { id: 43, name: "पेस्ट कोलगेट पांढरा (Colgate White)", baseWeight: 1, unit: "Pcs", basePrice: 10 },
+            { id: 44, name: "कोलगेट जेल (Colgate Gel)", baseWeight: 1, unit: "Pcs", basePrice: 10 },
+            { id: 45, name: "पतंजली पेस्ट (Patanjali Paste)", baseWeight: 1, unit: "Pcs", basePrice: 10 },
+            { id: 46, name: "डाबर लाल पेस्ट (Dabur Red Paste)", baseWeight: 1, unit: "Pcs", basePrice: 10 },
+            { id: 47, name: "क्लोजअप पेस्ट (Closeup Paste)", baseWeight: 1, unit: "Pcs", basePrice: 10 },
+            { id: 48, name: "डाबर बबुल पेस्ट (Dabur Babool Paste)", baseWeight: 1, unit: "Pcs", basePrice: 10 },
+            { id: 49, name: "लाल दंत मंजन (Lal Dant Manjan)", baseWeight: 1, unit: "Pcs", basePrice: 10 },
+            { id: 50, name: "संतूर साबण (Santoor Soap)", baseWeight: 1, unit: "Pcs", basePrice: 10 },
+            { id: 51, name: "No. 1 साबण (Godrej No.1 Soap)", baseWeight: 1, unit: "Pcs", basePrice: 10 },
+            { id: 52, name: "विम साबण (Vim Soap)", baseWeight: 1, unit: "Pcs", basePrice: 10 },
+            { id: 53, name: "रिन साबण (Rin Soap)", baseWeight: 1, unit: "Pcs", basePrice: 10 },
+            { id: 54, name: "सरगम साबण (Sargam Soap)", baseWeight: 1, unit: "Pcs", basePrice: 10 },
+            { id: 55, name: "विम पावडर (Vim Powder)", baseWeight: 1, unit: "Pcs", basePrice: 10 },
+            { id: 56, name: "घडी सरफ एक्ससेल (Ghadi / Surf Excel)", baseWeight: 1, unit: "Pcs", basePrice: 10 },
+            { id: 57, name: "टाईड सरफ (Tide Detergent)", baseWeight: 1, unit: "Pcs", basePrice: 10 },
+            { id: 58, name: "एरिअल सरफ (Ariel Detergent)", baseWeight: 1, unit: "Pcs", basePrice: 10 },
+            { id: 59, name: "लक्स साबण (Lux Soap)", baseWeight: 1, unit: "Pcs", basePrice: 10 },
+            { id: 60, name: "लाईफबॉय साबण (Lifebuoy Soap)", baseWeight: 1, unit: "Pcs", basePrice: 10 },
+            { id: 61, name: "रंगोळी (Rangoli Powder)", baseWeight: 1, unit: "Pcs", basePrice: 10 },
+            { id: 62, name: "इनो (Eno)", baseWeight: 1, unit: "Pcs", basePrice: 10 },
+            { id: 63, name: "माचीस चावी (Matchbox Chaavi)", baseWeight: 1, unit: "Pcs", basePrice: 10 },
+            { id: 64, name: "सेल घड्याळ (Clock Battery Cells)", baseWeight: 1, unit: "Pcs", basePrice: 20 },
+            { id: 65, name: "सेल रिमोट (Remote Battery Cells)", baseWeight: 1, unit: "Pcs", basePrice: 20 }
+        ];
+
+        let cart = [];
+
+        function loadProducts(productsToShow = products) {
+            const container = document.getElementById('products-container');
+            if (productsToShow.length === 0) {
+                container.innerHTML = "<p style='grid-column: 1/-1; text-align: center; color: #888;'>No products found.</p>";
+                return;
+            }
+            
+            container.innerHTML = productsToShow.map(product => {
+                let unitLabel = product.unit;
+                return `
+                    <div class="product-card">
+                        <div class="product-name">${product.name}</div>
+                        <div class="weight-custom-container">
+                            <input type="number" class="weight-input" id="weight-${product.id}" value="${product.baseWeight}" min="1" oninput="updateCardPrice(${product.id})">
+                            <span class="weight-unit-label">${unitLabel}</span>
+                        </div>
+                        <div class="product-price" id="price-${product.id}">Price: ₹${product.basePrice}</div>
+                        <button class="add-btn" onclick="addToCart(${product.id})">ADD</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateCardPrice(id) {
+            const product = products.find(p => p.id === id);
+            const inputEl = document.getElementById(`weight-${id}`);
+            let currentWeight = parseFloat(inputEl.value) || 0;
+
+            let calculatedPrice = Math.round((currentWeight / product.baseWeight) * product.basePrice);
+            
+            const priceEl = document.getElementById(`price-${id}`);
+            priceEl.innerText = `Price: ₹${calculatedPrice}`;
+        }
+
+        function filterProducts() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const filtered = products.filter(product => 
+                product.name.toLowerCase().includes(query)
+            );
+            loadProducts(filtered);
+        }
+
+        document.getElementById('search-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                filterProducts();
+            }
+        });
+
+        function addToCart(id) {
+            const product = products.find(p => p.id === id);
+            const inputEl = document.getElementById(`weight-${id}`);
+            let chosenWeight = parseFloat(inputEl.value) || product.baseWeight;
+
+            let calculatedPrice = Math.round((chosenWeight / product.baseWeight) * product.basePrice);
+
+            const cartItemKey = `${id}-${chosenWeight}${product.unit}`;
+            const exist = cart.find(item => item.cartKey === cartItemKey);
+
+            if (exist) {
+                exist.quantity += 1;
+            } else {
+                cart.push({
+                    cartKey: cartItemKey,
+                    name: product.name,
+                    weight: `${chosenWeight} ${product.unit}`,
+                    price: calculatedPrice,
+                    quantity: 1
+                });
+            }
+            updateCart();
+        }
+
+        function cancelProduct(cartKey) {
+            cart = cart.filter(item => item.cartKey !== cartKey);
+            updateCart();
+        }
+
+        function clearAllCart() {
+            cart = [];
+            updateCart();
+        }
+
+        function updateCart() {
+            const cartItemsContainer = document.getElementById('cart-items');
+            const cartCount = document.getElementById('cart-count');
+            const cartTotalAmount = document.getElementById('cart-total-amount');
+            const errorBox = document.getElementById('error-box');
+
+            let totalItems = 0;
+            let totalPrice = 0;
+
+            cartItemsContainer.innerHTML = cart.map(item => {
+                totalItems += item.quantity;
+                totalPrice += item.price * item.quantity;
+                return `
+                    <div class="cart-item">
+                        <span>${item.name} (${item.weight}) x${item.quantity}</span>
+                        <div>
+                            <span>₹${item.price * item.quantity}</span>
+                            <button class="remove-item-btn" onclick="cancelProduct('${item.cartKey}')">&times;</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            cartCount.innerText = totalItems;
+            cartTotalAmount.innerText = totalPrice;
+
+            if (totalPrice > 0 && totalPrice < 500) {
+                errorBox.style.display = 'block';
+            } else {
+                errorBox.style.display = 'none';
+            }
+        }
+
+        function toggleCart() {
+            const sidebar = document.getElementById('cart-sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        function sendOrderToWhatsApp() {
+            if (cart.length === 0) {
+                alert("Your cart is empty!");
+                return;
+            }
+
+            let total = 0;
+            cart.forEach(item => {
+                total += item.price * item.quantity;
+            });
+
+            if (total < 500) {
+                alert("Order cannot be placed! Bill should be above 500rs for home delivery.");
+                return;
+            }
+
+            const name = document.getElementById('cust-name').value.trim();
+            const address = document.getElementById('cust-address').value.trim();
+
+            if (!name || !address) {
+                alert("Please fill in your Name and Address for delivery!");
+                return;
+            }
+
+            let message = `*New Order from Ramaswami Kirana Mart*\n\n`;
+            message += `👤 *Customer Name:* ${name}\n`;
+            message += `📍 *Delivery Address:* ${address}\n\n`;
+            message += `📦 *Items:*\n`;
+
+            cart.forEach((item, index) => {
+                message += `${index + 1}. ${item.name} (${item.weight}) - Qty: ${item.quantity} - ₹${item.price * item.quantity}\n`;
+            });
+
+            message += `\n💵 *Total Bill:* ₹${total}\n\nThank you for ordering!`;
+            
+            const url = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
+        }
+
+        loadProducts();
+    </script>
+</body>
+</html>
