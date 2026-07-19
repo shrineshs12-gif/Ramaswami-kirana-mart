@@ -144,24 +144,24 @@
             background-color: var(--primary-dark);
         }
 
-        /* --- Category Tabs --- */
-        .categories-container {
+        /* --- Category Styles --- */
+        .category-container {
             display: flex;
             gap: 10px;
+            margin-bottom: 40px;
             overflow-x: auto;
-            padding-bottom: 15px;
-            margin-bottom: 30px;
-            scrollbar-width: none; /* Firefox */
+            padding-bottom: 10px;
+            scrollbar-width: none;
+        }
+        
+        .category-container::-webkit-scrollbar {
+            display: none;
         }
 
-        .categories-container::-webkit-scrollbar {
-            display: none; /* Chrome/Safari */
-        }
-
-        .category-tab {
+        .category-btn {
             background: var(--white);
             color: var(--gray-600);
-            border: 1px solid var(--gray-300);
+            border: 1px solid var(--gray-100);
             padding: 10px 20px;
             border-radius: 50px;
             font-size: 14px;
@@ -169,13 +169,13 @@
             cursor: pointer;
             white-space: nowrap;
             transition: var(--transition);
+            box-shadow: var(--shadow-sm);
         }
 
-        .category-tab.active, .category-tab:hover {
+        .category-btn:hover, .category-btn.active {
             background: var(--primary);
             color: var(--white);
             border-color: var(--primary);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
         }
 
         h2 {
@@ -537,21 +537,32 @@
 
     <div class="container">
         <div class="search-container">
-            <input type="text" id="search-input" class="search-input" placeholder="Search products (उदा. तांदूळ, साखर)...">
+            <input type="text" id="search-input" class="search-input" placeholder="Search products (उदा. तांदूळ, साखर, Biscuits)...">
             <button class="search-btn" onclick="filterProducts()">Search</button>
         </div>
 
-        <div class="categories-container">
-            <button class="category-tab active" onclick="selectCategory('all', this)">All Products</button>
-            <button class="category-tab" onclick="selectCategory('grains', this)">Grains & Rice</button>
-            <button class="category-tab" onclick="selectCategory('dals', this)">Dals & Pulses</button>
-            <button class="category-tab" onclick="selectCategory('oil-sugar', this)">Oil, Sugar & Jaggery</button>
-            <button class="category-tab" onclick="selectCategory('spices', this)">Spices</button>
-            <button class="category-tab" onclick="selectCategory('soaps', this)">Soaps & Detergents</button>
-            <button class="category-tab" onclick="selectCategory('personal-care', this)">Personal Care & Daily Needs</button>
+        <div class="category-container" id="category-container">
+            <button class="category-btn active" onclick="filterByCategory('All', this)">All Products</button>
+            <button class="category-btn" onclick="filterByCategory('Kirana', this)">Kirana Items</button>
+            <button class="category-btn" onclick="filterByCategory('Masala', this)">Masala Items</button>
+            <button class="category-btn" onclick="filterByCategory('Suhana', this)">Suhana Masale</button>
+            <button class="category-btn" onclick="filterByCategory('Oils', this)">Oils</button>
+            <button class="category-btn" onclick="filterByCategory('HairCare', this)">Hair Care</button>
+            <button class="category-btn" onclick="filterByCategory('SkinCare', this)">Skin Care</button>
+            <button class="category-btn" onclick="filterByCategory('PersonalCare', this)">Personal Care</button>
+            <button class="category-btn" onclick="filterByCategory('Cleaning', this)">Cleaning & Soaps</button>
+            <button class="category-btn" onclick="filterByCategory('Detergent', this)">Detergent Powders</button>
+            <button class="category-btn" onclick="filterByCategory('TeaCoffee', this)">Tea & Coffee</button>
+            <button class="category-btn" onclick="filterByCategory('Biscuits', this)">Biscuits & Cookies</button>
+            <button class="category-btn" onclick="filterByCategory('Snacks', this)">Snacks & Foods</button>
+            <button class="category-btn" onclick="filterByCategory('Bakery', this)">Bakery</button>
+            <button class="category-btn" onclick="filterByCategory('Oral', this)">Dental & Oral Care</button>
+            <button class="category-btn" onclick="filterByCategory('Pooja', this)">Pooja Items</button>
+            <button class="category-btn" onclick="filterByCategory('Stationary', this)">Stationary</button>
+            <button class="category-btn" onclick="filterByCategory('Misc', this)">Misc</button>
         </div>
 
-        <h2 id="section-title">All Products</h2>
+        <h2 id="section-title">Fresh Products</h2>
         <div class="products-grid" id="products-container"></div>
     </div>
 
@@ -589,74 +600,275 @@
 
     <script>
         const WHATSAPP_NUMBER = "7020444707"; 
-        let currentSelectedCategory = "all";
+        let currentSelectedCategory = "All";
 
         const products = [
-            { id: 1, name: "L M तांदूळ (L M Rice)", baseWeight: 1, unit: "kg", basePrice: 62, category: "grains" },
-            { id: 2, name: "टॉपार तूरडाळ (Toor Dal)", baseWeight: 1, unit: "kg", basePrice: 140, category: "dals" },
-            { id: 3, name: "साखर (Sugar)", baseWeight: 1, unit: "kg", basePrice: 48, category: "oil-sugar" },
-            { id: 4, name: "पोहा (Poha)", baseWeight: 1, unit: "kg", basePrice: 60, category: "grains" },
-            { id: 5, name: "रवा (Rava)", baseWeight: 1, unit: "kg", basePrice: 48, category: "grains" },
-            { id: 6, name: "लापसी रवा (Lapsi Rava)", baseWeight: 1, unit: "kg", basePrice: 48, category: "grains" },
-            { id: 7, name: "मुगडाळ (Moong Dal)", baseWeight: 1, unit: "kg", basePrice: 140, category: "dals" },
-            { id: 8, name: "उडीद डाळ (Urad Dal)", baseWeight: 1, unit: "kg", basePrice: 140, category: "dals" },
-            { id: 9, name: "चना डाळ (Chana Dal)", baseWeight: 1, unit: "kg", basePrice: 100, category: "dals" },
-            { id: 10, name: "मैदा (Maida)", baseWeight: 1, unit: "kg", basePrice: 48, category: "grains" },
-            { id: 11, name: "पोळीचे पीठ (Wheat Flour / Atta)", baseWeight: 1, unit: "kg", basePrice: 48, category: "grains" },
-            { id: 12, name: "शाबुदाणा (Sabudana)", baseWeight: 1, unit: "kg", basePrice: 70, category: "grains" },
-            { id: 13, name: "शेंगा भाजके (Roasted Peanuts)", baseWeight: 1, unit: "kg", basePrice: 160, category: "oil-sugar" },
-            { id: 14, name: "शेंगा कच्चे घुंगरू (Raw Peanuts)", baseWeight: 1, unit: "kg", basePrice: 160, category: "oil-sugar" },
-            { id: 15, name: "हळद (Turmeric)", baseWeight: 1, unit: "kg", basePrice: 300, category: "spices" },
-            { id: 16, name: "लाल मिरची (Red Chilli)", baseWeight: 1, unit: "kg", basePrice: 225, category: "spices" },
-            { id: 17, name: "धने पावडर (Coriander Powder)", baseWeight: 50, unit: "g", basePrice: 10, category: "spices" },
-            { id: 18, name: "धने (Coriander Seeds)", baseWeight: 1, unit: "kg", basePrice: 160, category: "spices" },
-            { id: 19, name: "लवंग (Cloves)", baseWeight: 50, unit: "g", basePrice: 65, category: "spices" },
-            { id: 20, name: "इलायची (Cardamom)", baseWeight: 50, unit: "g", basePrice: 200, category: "spices" },
-            { id: 21, name: "फुटाणे (Roasted Chana)", baseWeight: 1, unit: "kg", basePrice: 120, category: "grains" },
-            { id: 22, name: "जिरे (Cumin Seeds)", baseWeight: 50, unit: "g", basePrice: 20, category: "spices" },
-            { id: 23, name: "मोहरी (Mustard Seeds)", baseWeight: 50, unit: "g", basePrice: 7, category: "spices" },
-            { id: 24, name: "मेथी / मेंथुल (Fenugreek Seeds)", baseWeight: 50, unit: "g", basePrice: 10, category: "spices" },
-            { id: 25, name: "टाटा मीठ (Tata Salt)", baseWeight: 1, unit: "kg", basePrice: 30, category: "oil-sugar" },
-            { id: 26, name: "सादा मीठ (Regular Salt)", baseWeight: 1, unit: "kg", basePrice: 12, category: "oil-sugar" },
-            { id: 27, name: "जाड मीठ (Crystal Salt)", baseWeight: 1, unit: "kg", basePrice: 12, category: "oil-sugar" },
-            { id: 28, name: "रुची गोल्ड तेल (Ruchi Gold Oil)", baseWeight: 1, unit: "Pkt", basePrice: 135, category: "oil-sugar" },
-            { id: 29, name: "सोयाबीन तेल रोहिणी (Soyabean Oil Rohini)", baseWeight: 1, unit: "kg", basePrice: 170, category: "oil-sugar" },
-            { id: 30, name: "आटा समृद्धी (Atta Samriddhi)", baseWeight: 1, unit: "kg", basePrice: 46, category: "grains" },
-            { id: 31, name: "गूळ (Jaggery)", baseWeight: 1, unit: "kg", basePrice: 64, category: "oil-sugar" },
-            { id: 32, name: "मसूर डाळ (Masoor Dal)", baseWeight: 1, unit: "kg", basePrice: 100, category: "dals" },
-            { id: 33, name: "हिरा बेसन (Hira Besan)", baseWeight: 1, unit: "kg", basePrice: 120, category: "dals" },
-            { id: 34, name: "मिठ (Salt)", baseWeight: 1, unit: "kg", basePrice: 10, category: "oil-sugar" },
-            { id: 35, name: "दालचिनी (Cinnamon)", baseWeight: 50, unit: "g", basePrice: 40, category: "spices" },
-            { id: 36, name: "मिरे / मिराळ (Black Pepper)", baseWeight: 50, unit: "g", basePrice: 50, category: "spices" },
-            { id: 37, name: "चक्रफुल (Star Anise)", baseWeight: 50, unit: "g", basePrice: 100, category: "spices" },
-            { id: 38, name: "बडीशोप (Fennel Seeds)", baseWeight: 50, unit: "g", basePrice: 25, category: "spices" },
-            { id: 39, name: "भगर (Bhagar)", baseWeight: 1, unit: "kg", basePrice: 160, category: "grains" },
-            { id: 40, name: "मिल्कमेकर मिडियम (Soya Chunks Medium)", baseWeight: 1, unit: "kg", basePrice: 120, category: "dals" },
-            { id: 41, name: "मिल्कमेकर चुरा (Soya Chunks Crushed)", baseWeight: 1, unit: "kg", basePrice: 120, category: "dals" },
-            { id: 42, name: "गहू अजंठा (Ajantha Wheat)", baseWeight: 1, unit: "kg", basePrice: 45, category: "grains" },
-            { id: 43, name: "पेस्ट कोलगेट पांढरा (Colgate White)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "personal-care" },
-            { id: 44, name: "कोलगेट जेल (Colgate Gel)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "personal-care" },
-            { id: 45, name: "पतंजली पेस्ट (Patanjali Paste)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "personal-care" },
-            { id: 46, name: "डाबर लाल पेस्ट (Dabur Red Paste)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "personal-care" },
-            { id: 47, name: "क्लोजअप पेस्ट (Closeup Paste)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "personal-care" },
-            { id: 48, name: "डाबर बबुल पेस्ट (Dabur Babool Paste)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "personal-care" },
-            { id: 49, name: "लाल दंत मंजन (Lal Dant Manjan)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "personal-care" },
-            { id: 50, name: "संतूर साबण (Santoor Soap)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "soaps" },
-            { id: 51, name: "No. 1 साबण (Godrej No.1 Soap)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "soaps" },
-            { id: 52, name: "विम साबण (Vim Soap)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "soaps" },
-            { id: 53, name: "रिन साबण (Rin Soap)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "soaps" },
-            { id: 54, name: "सरगम साबण (Sargam Soap)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "soaps" },
-            { id: 55, name: "विम पावडर (Vim Powder)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "soaps" },
-            { id: 56, name: "घडी सरफ एक्ससेल (Ghadi / Surf Excel)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "soaps" },
-            { id: 57, name: "टाईड सरफ (Tide Detergent)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "soaps" },
-            { id: 58, name: "एरिअल सरफ (Ariel Detergent)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "soaps" },
-            { id: 59, name: "लक्स साबण (Lux Soap)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "soaps" },
-            { id: 60, name: "लाईफबॉय साबण (Lifebuoy Soap)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "soaps" },
-            { id: 61, name: "रंगोळी (Rangoli Powder)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "personal-care" },
-            { id: 62, name: "इनो (Eno)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "personal-care" },
-            { id: 63, name: "माचीस चावी (Matchbox Chaavi)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "personal-care" },
-            { id: 64, name: "cell घड्याळ (Clock Battery Cells)", baseWeight: 1, unit: "Pcs", basePrice: 20, category: "personal-care" },
-            { id: 65, name: "सेल रिमोट (Remote Battery Cells)", baseWeight: 1, unit: "Pcs", basePrice: 20, category: "personal-care" }
+            // --- GRN / KIRANA ITEMS ---
+            { id: 1, name: "L M तांदूळ (L M Rice)", baseWeight: 1, unit: "kg", basePrice: 62, category: "Kirana" },
+            { id: 2, name: "टॉपार तूरडाळ (Toor Dal)", baseWeight: 1, unit: "kg", basePrice: 140, category: "Kirana" },
+            { id: 3, name: "डॉलर तूरडाळ (Dollar Toor Dal)", baseWeight: 1, unit: "kg", basePrice: 140, category: "Kirana" },
+            { id: 4, name: "मसूर डाळ (Masoor Dal)", baseWeight: 1, unit: "kg", basePrice: 100, category: "Kirana" },
+            { id: 5, name: "मुगडाळ (Moong Dal)", baseWeight: 1, unit: "kg", basePrice: 120, category: "Kirana" },
+            { id: 6, name: "उडीद डाळ (Urad Dal)", baseWeight: 1, unit: "kg", basePrice: 150, category: "Kirana" },
+            { id: 7, name: "हरभरा शेंगा (Chana Ghungroo)", baseWeight: 1, unit: "kg", basePrice: 100, category: "Kirana" },
+            { id: 8, name: "अक्खा मूग / मटकी (Whole Moong / Matki)", baseWeight: 1, unit: "kg", basePrice: 120, category: "Kirana" },
+            { id: 9, name: "अक्खा उडीद (Whole Urad)", baseWeight: 1, unit: "kg", basePrice: 120, category: "Kirana" },
+            { id: 10, name: "साखर (Sugar)", baseWeight: 1, unit: "kg", basePrice: 48, category: "Kirana" },
+            { id: 11, name: "रवा (Rava)", baseWeight: 1, unit: "kg", basePrice: 48, category: "Kirana" },
+            { id: 12, name: "लापसी रवा (Lapsi Rava)", baseWeight: 1, unit: "kg", basePrice: 48, category: "Kirana" },
+            { id: 13, name: "पोहा (Poha)", baseWeight: 1, unit: "kg", basePrice: 60, category: "Kirana" },
+            { id: 14, name: "मैदा (Maida)", baseWeight: 1, unit: "kg", basePrice: 48, category: "Kirana" },
+            { id: 15, name: "पोळीचे पीठ (Wheat Flour / Atta)", baseWeight: 1, unit: "kg", basePrice: 48, category: "Kirana" },
+            { id: 16, name: "गूळ (Jaggery)", baseWeight: 1, unit: "kg", basePrice: 64, category: "Kirana" },
+            { id: 17, name: "आटा समृद्धी (Atta Samriddhi)", baseWeight: 1, unit: "kg", basePrice: 46, category: "Kirana" },
+            { id: 18, name: "गहू अजंठा (Ajantha Wheat)", baseWeight: 1, unit: "kg", basePrice: 45, category: "Kirana" },
+            { id: 19, name: "शाबुदाणा (Sabudana)", baseWeight: 1, unit: "kg", basePrice: 80, category: "Kirana" },
+            { id: 20, name: "डिस्को शाबुदाणा (Disco Sabudana)", baseWeight: 1, unit: "kg", basePrice: 90, category: "Kirana" },
+            { id: 21, name: "शेंगा भाजके (Roasted Peanuts)", baseWeight: 1, unit: "kg", basePrice: 160, category: "Kirana" },
+            { id: 22, name: "शेंगा कच्चे घुंगरू (Raw Peanuts)", baseWeight: 1, unit: "kg", basePrice: 160, category: "Kirana" },
+            { id: 23, name: "फुटाणे (Roasted Chana)", baseWeight: 1, unit: "kg", basePrice: 120, category: "Kirana" },
+            { id: 24, name: "तीळ (Sesame Seeds)", baseWeight: 1, unit: "kg", basePrice: 220, category: "Kirana" },
+            { id: 25, name: "खोबरा वाटी (Dry Coconut)", baseWeight: 1, unit: "kg", basePrice: 425, category: "Kirana" },
+            { id: 26, name: "टाटा बारीक मीठ (Tata Salt Fine)", baseWeight: 1, unit: "kg", basePrice: 30, category: "Kirana" },
+            { id: 27, name: "सादा बारीक मीठ (Regular Salt Fine)", baseWeight: 1, unit: "kg", basePrice: 12, category: "Kirana" },
+            { id: 28, name: "जाड मीठ (Crystal Salt)", baseWeight: 1, unit: "kg", basePrice: 12, category: "Kirana" },
+            { id: 29, name: "सोडाकार (Baking Soda)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Kirana" },
+            { id: 30, name: "मिल्कमेकर मिडियम (Soya Chunks Medium)", baseWeight: 1, unit: "kg", basePrice: 120, category: "Kirana" },
+            { id: 31, name: "मिल्कमेकर चुरा (Soya Chunks Crushed)", baseWeight: 1, unit: "kg", basePrice: 125, category: "Kirana" },
+            { id: 32, name: "भगर (Bhagar)", baseWeight: 1, unit: "kg", basePrice: 240, category: "Kirana" },
+            { id: 33, name: "कॉर्नफ्लॉवर (Corn Flour)", baseWeight: 1, unit: "kg", basePrice: 80, category: "Kirana" },
+            { id: 34, name: "हिरा बेसन (Hira Besan)", baseWeight: 1, unit: "kg", basePrice: 125, category: "Kirana" },
+            { id: 200, name: "Badam (बदाम)", baseWeight: 50, unit: "g", basePrice: 260, category: "Kirana" },
+            { id: 201, name: "Kaju (काजू)", baseWeight: 50, unit: "g", basePrice: 60, category: "Kirana" },
+            { id: 202, name: "Charoli (चार ओळी)", baseWeight: 50, unit: "g", basePrice: 135, category: "Kirana" },
+            { id: 203, name: "Kismis (किशमिश)", baseWeight: 50, unit: "g", basePrice: 30, category: "Kirana" },
+            { id: 204, name: "Khaskhas (खसखस)", baseWeight: 50, unit: "g", basePrice: 140, category: "Kirana" },
+            { id: 205, name: "Pattaoli (पत्ताओळी)", baseWeight: 1, unit: "Pkt", basePrice: 20, category: "Kirana" },
+            { id: 206, name: "Dron Wati (द्रोण वाटी)", baseWeight: 1, unit: "Pkt", basePrice: 25, category: "Kirana" },
+            { id: 207, name: "Plastic Glass (प्लास्टिक ग्लास)", baseWeight: 1, unit: "Pkt", basePrice: 30, category: "Kirana" },
+            { id: 208, name: "Jumbo Glass (जम्बो ग्लास)", baseWeight: 1, unit: "Pcs", basePrice: 2.5, category: "Kirana" },
+            { id: 209, name: "Tea Glass (चहा ग्लास)", baseWeight: 1, unit: "Pkt", basePrice: 20, category: "Kirana" },
+            { id: 210, name: "Silver Roll / Pouch", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Kirana" },
+
+            // --- MASALA ITEMS ---
+            { id: 35, name: "लवंग (Cloves)", baseWeight: 50, unit: "g", basePrice: 65, category: "Masala" },
+            { id: 36, name: "इलायची (Cardamom)", baseWeight: 50, unit: "g", basePrice: 60, category: "Masala" },
+            { id: 37, name: "जायफळ (Nutmeg)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Masala" },
+            { id: 38, name: "चक्रफुल / छत्तीफूल (Star Anise)", baseWeight: 50, unit: "g", basePrice: 100, category: "Masala" },
+            { id: 39, name: "दालचिनी (Cinnamon)", baseWeight: 50, unit: "g", basePrice: 45, category: "Masala" },
+            { id: 40, name: "शाजिरा (Shah Jeera)", baseWeight: 50, unit: "g", basePrice: 65, category: "Masala" },
+            { id: 41, name: "मिरे / मिराळ (Black Pepper)", baseWeight: 50, unit: "g", basePrice: 60, category: "Masala" },
+            { id: 42, name: "सुंठ (Dry Ginger)", baseWeight: 50, unit: "g", basePrice: 52, category: "Masala" },
+            { id: 44, name: "जिरे (Cumin Seeds)", baseWeight: 50, unit: "g", basePrice: 25, category: "Masala" },
+            { id: 45, name: "मोहरी (Mustard Seeds)", baseWeight: 50, unit: "g", basePrice: 8, category: "Masala" },
+            { id: 46, name: "मेथी / मेंथुल (Fenugreek Seeds)", baseWeight: 50, unit: "g", basePrice: 10, category: "Masala" },
+            { id: 47, name: "ओवा (Ajwain)", baseWeight: 50, unit: "g", basePrice: 15, category: "Masala" },
+            { id: 48, name: "बडीशोप (Fennel Seeds)", baseWeight: 50, unit: "g", basePrice: 25, category: "Masala" },
+            { id: 49, name: "लाल मिरची पावडर (Red Chilli Powder)", baseWeight: 1, unit: "kg", basePrice: 225, category: "Masala" },
+            { id: 50, name: "हळद पावडर (Turmeric Powder)", baseWeight: 1, unit: "kg", basePrice: 300, category: "Masala" },
+            { id: 51, name: "धने (Coriander Seeds)", baseWeight: 1, unit: "kg", basePrice: 170, category: "Masala" },
+            { id: 52, name: "पास्ता मसाला (Pasta Masala)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Masala" },
+            { id: 211, name: "Gharkul Masala (घरकुल मसाला)", baseWeight: 1, unit: "Pcs", basePrice: 1, category: "Masala" },
+            { id: 212, name: "Gharkul Masala (घरकुल मसाला)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Masala" },
+
+            // --- SUHANA MASALE ---
+            { id: 53, name: "सुहाना बिर्यानी मसाला (Suhana Biryani Masala)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Suhana" },
+            { id: 54, name: "सुहाना चिकन मसाला (Suhana Chicken Masala)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Suhana" },
+            { id: 55, name: "सुहाना चिकन बिर्यानी मसाला (Suhana Chicken Biryani)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Suhana" },
+            { id: 56, name: "सुहाना सांबर मसाला (Suhana Sambar Masala)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Suhana" },
+            { id: 57, name: "सुहाना अंडी मसाला (Suhana Egg Masala)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Suhana" },
+            { id: 58, name: "सुहाना मटन मसाला (Suhana Mutton Masala)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Suhana" },
+            { id: 59, name: "सुहाना पनीर मसाला (Suhana Paneer Masala)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Suhana" },
+            { id: 60, name: "सुहाना चाट मसाला (Suhana Chaat Masala)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Suhana" },
+            { id: 61, name: "सुहाना पावभाजी मसाला (Suhana Pavbhaji Masala)", baseWeight: 1, unit: "Pcs", basePrice: 20, category: "Suhana" },
+            { id: 62, name: "सुहाना अंबारी मसाला (Suhana Ambari Masala)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Suhana" },
+
+            // --- OILS ---
+            { id: 64, name: " रोहिणी ( Oil Rohini)", baseWeight: 1, unit: "kg", basePrice: 170, category: "Oils" },
+            { id: 65, name: "रुची GOLD तेल (Ruchi Gold Oil)", baseWeight: 1, unit: "Pkt", basePrice: 135, category: "Oils" },
+            { id: 66, name: "खोबरा तेल पॅраशूट (Parachute Coconut Oil 125g)", baseWeight: 1, unit: "Pcs", basePrice: 35, category: "Oils" },
+
+            // --- SHAMPOO & HAIR CARE ---
+            { id: 67, name: "क्लिनिक प्लस शॅम्पू (Clinic Plus Sachet)", baseWeight: 1, unit: "Pcs", basePrice: 1, category: "HairCare" },
+            { id: 68, name: "डव्ह शॅम्पू (Dove Shampoo Sachet)", baseWeight: 1, unit: "Pcs", basePrice: 2, category: "HairCare" },
+            { id: 69, name: "सनसिल्क पिंक शॅम्पू (Sunsilk Pink Sachet)", baseWeight: 1, unit: "Pcs", basePrice: 1, category: "HairCare" },
+            { id: 70, name: "सनसिल्क ब्लॅक शॅम्पू (Sunsilk Black Sachet)", baseWeight: 1, unit: "Pcs", basePrice: 1, category: "HairCare" },
+            { id: 71, name: "चिक शॅम्पू (Chik Shampoo Sachet)", baseWeight: 1, unit: "Pcs", basePrice: 1, category: "HairCare" },
+            { id: 72, name: "डव्ह कंडिशनर (Dove Conditioner)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "HairCare" },
+            { id: 73, name: "वाटीका तेल/शॅम्पू (Vatika Care)", baseWeight: 1, unit: "Pcs", basePrice: 1, category: "HairCare" },
+            { id: 74, name: "इन्दुलेखा शॅम्पू (Indulekha Shampoo)", baseWeight: 1, unit: "Pcs", basePrice: 2, category: "HairCare" },
+            { id: 75, name: "हेड अँड शोल्डर (Head & Shoulders Sachet)", baseWeight: 1, unit: "Pcs", basePrice: 2, category: "HairCare" },
+            { id: 213, name: "Nisha Hair Color Black (निशा)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "HairCare" },
+            { id: 214, name: "Ganpati Mehendi Black (गणपती मेहंदी)", baseWeight: 1, unit: "Pcs", basePrice: 15, category: "HairCare" },
+            { id: 215, name: "Godrej Rich Creme Black (गोदरेज क्रीम)", baseWeight: 1, unit: "Pcs", basePrice: 15, category: "HairCare" },
+            { id: 216, name: "Streax Shampoo Hair Color Black", baseWeight: 1, unit: "Pcs", basePrice: 15, category: "HairCare" },
+            { id: 217, name: "Indica Shampoo Hair Color Black", baseWeight: 1, unit: "Pcs", basePrice: 15, category: "HairCare" },
+            { id: 218, name: "Nisha Hair Color Red (निशा लाल)", baseWeight: 1, unit: "Pcs", basePrice: 15, category: "HairCare" },
+            { id: 219, name: "Gillette Guard Razor Set", baseWeight: 1, unit: "Pcs", basePrice: 25, category: "HairCare" },
+            { id: 220, name: "Laser Razor Set", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "HairCare" },
+            { id: 221, name: "Gillette Blade Handle", baseWeight: 1, unit: "Pcs", basePrice: 15, category: "HairCare" },
+
+            // --- SKIN CARE ---
+            { id: 222, name: "Fair & Lovely (Glow & Lovely)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "SkinCare" },
+            { id: 223, name: "Vaseline Jelly (व्हॅसलीन)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "SkinCare" },
+            { id: 224, name: "Vaseline Jelly (व्हॅसलीन)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "SkinCare" },
+            { id: 225, name: "Body Lotion", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "SkinCare" },
+            { id: 226, name: "Boro Plus Cream", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "SkinCare" },
+            { id: 227, name: "Zandu Balm (झेंडू बाम)", baseWeight: 1, unit: "Pcs", basePrice: 2, category: "SkinCare" },
+
+            // --- PERSONAL CARE ---
+            { id: 228, name: "Huggies Diapers M-Size", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "PersonalCare" },
+            { id: 229, name: "Huggies Diapers S-Size", baseWeight: 1, unit: "Pcs", basePrice: 9, category: "PersonalCare" },
+            { id: 230, name: "Whisper Sanitary Pads XL", baseWeight: 1, unit: "Pcs", basePrice: 45, category: "PersonalCare" },
+            { id: 231, name: "Prowease Pads XL", baseWeight: 1, unit: "Pcs", basePrice: 40, category: "PersonalCare" },
+            { id: 232, name: "Comfy Sanitary Pads XL", baseWeight: 1, unit: "Pcs", basePrice: 28, category: "PersonalCare" },
+
+            // --- CLEANING & SOAPS ---
+            { id: 76, name: "कंफर्ट फॅब्रिक (Comfort Conditioner)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Cleaning" },
+            { id: 77, name: "विम लिक्विड (Vim Liquid)", baseWeight: 1, unit: "Pcs", basePrice: 25, category: "Cleaning" },
+            { id: 78, name: "रिन लिक्विड (Rin Liquid)", baseWeight: 1, unit: "Pcs", basePrice: 20, category: "Cleaning" },
+            { id: 79, name: "रिन साबण (Rin Soap)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Cleaning" },
+            { id: 80, name: "व्हील साबण (Wheel Soap)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Cleaning" },
+            { id: 81, name: "सरगम साबण (Sargam Soap)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Cleaning" },
+            { id: 82, name: "विम साबण (Vim Soap Small)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Cleaning" },
+            { id: 83, name: "विम साबण (Vim Soap Large)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Cleaning" },
+            { id: 84, name: "विम साबण पॅक (Vim Pack of 5)", baseWeight: 1, unit: "Pkt", basePrice: 40, category: "Cleaning" },
+            { id: 85, name: "संतूर साबण (small Santoor Soap Single)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Cleaning" },
+            { id: 86, name: "संतूर साबण पॅक (Santoor Pack of 4)", baseWeight: 1, unit: "Pkt", basePrice: 150, category: "Cleaning" },
+            { id: 160, name: "large santoor soap", baseWeight: 1, unit: "pcs", basePrice: 38, category: "Cleaning" },
+            { id: 87, name: "लक्स साबण (small Lux Soap Single)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Cleaning" },
+            { id: 88, name: "लक्स साबण पॅक (Lux Pack of 4)", baseWeight: 1, unit: "Pkt", basePrice: 150, category: "Cleaning" },
+            { id: 161, name: "large lux soap", baseWeight: 1, unit: "pcs", basePrice: 38, category: "Cleaning" },
+            { id: 89, name: "लाईफबॉय साबण (Lifeboy Single)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Cleaning" },
+            { id: 163, name: "large lifeboy soap", baseWeight: 1, unit: "pcs", basePrice: 33, category: "Cleaning" },
+            { id: 162, name: "lifeboy big soap(pack of 5)", baseWeight: 1, unit: "pkt", basePrice: 165, category: "Cleaning" },
+            { id: 91, name: "डव्ह साबण (small Dove Bar)", baseWeight: 1, unit: "Pcs", basePrice: 25, category: "Cleaning" },
+            { id: 165, name: "large dove soap", baseWeight: 1, unit: "pcs", basePrice: 58, category: "Cleaning" },
+            { id: 92, name: "गॉडरेज नंबर १ साबण (Godrej No.1 Single)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Cleaning" },
+            { id: 93, name: "गॉडरेज नंबर १ पॅक (Godrej No.1 Pack of 4)", baseWeight: 1, unit: "Pkt", basePrice: 40, category: "Cleaning" },
+            { id: 94, name: "डेटॉल साबण (small Dettol Soap Single)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Cleaning" },
+            { id: 164, name: "large dettol soap", baseWeight: 1, unit: "pcs", basePrice: 37, category: "Cleaning" },
+            { id: 95, name: "डेटॉल साबण पॅक (Dettol Pack of 5)", baseWeight: 1, unit: "Pkt", basePrice: 182, category: "Cleaning" },
+
+            // --- DETERGENT POWDERS ---
+            { id: 96, name: "सरफ एक्ससेल (Surf Excel Small)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Detergent" },
+            { id: 97, name: "सरफ एक्ससेल १ किलो (Surf Excel 1kg)", baseWeight: 1, unit: "Pkt", basePrice: 140, category: "Detergent" },
+            { id: 98, name: "व्हील पावडर (Wheel Detergent Small)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Detergent" },
+            { id: 99, name: "एरिअल सरफ (Ariel Detergent Small)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Detergent" },
+            { id: 100, name: "एरिअल सरफ ५०० ग्रॅम (Ariel 500gm)", baseWeight: 1, unit: "Pkt", basePrice: 70, category: "Detergent" },
+            { id: 101, name: "टाईड सरफ (Tide Detergent Small)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Detergent" },
+            { id: 102, name: "टाईड सरफ १ किलो (Tide Detergent 1kg)", baseWeight: 1, unit: "Pkt", basePrice: 110, category: "Detergent" },
+            { id: 233, name: "Tejambari Detergent Powder (तेजांबरी)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Detergent" },
+            { id: 234, name: "Tejambari Detergent Powder (तेजांबरी)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Detergent" },
+            { id: 235, name: "Pitambari Powder (पितांबरी)", baseWeight: 1, unit: "Pcs", basePrice: 20, category: "Detergent" },
+
+            // --- TEA & COFFEE ---
+            { id: 103, name: "परिवार चहापत्ती (Parivar Tea Small)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "TeaCoffee" },
+            { id: 104, name: "परिवार चहापत्ती (Parivar Tea Mini)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "TeaCoffee" },
+            { id: 105, name: "परिवार चहापत्ती (Parivar Tea Micro)", baseWeight: 1, unit: "Pcs", basePrice: 1, category: "TeaCoffee" },
+            { id: 106, name: "परिवार चहापत्ती २५० ग्रॅम (Parivar 250gm)", baseWeight: 1, unit: "Pkt", basePrice: 150, category: "TeaCoffee" },
+            { id: 107, name: "रेड लेबल चहापत्ती (Red Label Small)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "TeaCoffee" },
+            { id: 108, name: "रेड लेबल २५० ग्रॅम (Red Label 250gm)", baseWeight: 1, unit: "Pkt", basePrice: 150, category: "TeaCoffee" },
+            { id: 109, name: "ब्रू कॉफी (Bru Coffee Sachet Mini)", baseWeight: 1, unit: "Pcs", basePrice: 2, category: "TeaCoffee" },
+            { id: 110, name: "ब्रू कॉफी (Bru Coffee Sachet Large)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "TeaCoffee" },
+            { id: 236, name: "Boost (बूस्ट पॅकेट)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "TeaCoffee" },
+
+            // --- BISCUITS & COOKIES ---
+            { id: 111, name: "पारले-जी बिस्कीट (Parle-G Mini)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Biscuits" },
+            { id: 112, name: "पारले-जी बिस्कीट (Parle-G Medium)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Biscuits" },
+            { id: 113, name: "गुड डे बिस्कीट (Good Day Large)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Biscuits" },
+            { id: 114, name: "गुड डे बिस्कीट (Good Day Small)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Biscuits" },
+            { id: 115, name: "मोनाको बिस्कीट (Monaco)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Biscuits" },
+            { id: 116, name: "मॅरी गोल्ड बिस्कीट (Marie Gold Small)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Biscuits" },
+            { id: 117, name: "मॅरी गोल्ड बिस्कीट (Marie Gold Large)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Biscuits" },
+            { id: 118, name: "क्रॅक जॅक बिस्कीट (Krack Jack)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Biscuits" },
+            { id: 119, name: "हॅपी हॅपी बिस्कीट (Happy Happy)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Biscuits" },
+            { id: 120, name: "टायगर बिस्कीट (Tiger Biscuit)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Biscuits" },
+            { id: 121, name: "बर्बन बिस्कीट (Bourbon)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Biscuits" },
+            { id: 122, name: "ओरिओ बिस्कीट (Oreo)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Biscuits" },
+            { id: 123, name: "२०-२० बिस्कीट (20-20 Biscuit)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Biscuits" },
+            { id: 124, name: "पारले मॅजिक क्रीम (Parle Magic Cream)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Biscuits" },
+            { id: 125, name: "ऑरेंज क्रीम बिस्कीट (Orange Cream)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Biscuits" },
+            { id: 126, name: "हॉर्लिक्स पॅकेट (Horlicks Small)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Biscuits" },
+            { id: 127, name: "हॉर्लिक्स पॅकेट (Horlicks Medium)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Biscuits" },
+            { id: 128, name: "नॉनस्टॉप बिस्कीट (Nonstop Biscuit)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Biscuits" },
+            { id: 129, name: "कोकोनट कुकीज (Coconut Cookie Large)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Biscuits" },
+            { id: 130, name: "कोकोनट कुकीज (Coconut Cookie Small)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Biscuits" },
+
+            // --- NOODLES, SNACKS & FOODS ---
+            { id: 131, name: "इप्पी नुडल्स (Yippee Noodles Small)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Snacks" },
+            { id: 132, name: "इप्पी नुडल्स (Yippee Noodles Large)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Snacks" },
+            { id: 133, name: "मॅगी पास्ता (Maggi Pasta)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Snacks" },
+            { id: 134, name: "किसान जॅम (Kissan Jam)", baseWeight: 1, unit: "Pcs", basePrice: 25, category: "Snacks" },
+            { id: 135, name: "टोमॅटो केचअप (Tomato Ketchup Sachet)", baseWeight: 1, unit: "Pcs", basePrice: 2, category: "Snacks" },
+            { id: 136, name: "टोमॅटो केचअप बॉटल (Tomato Ketchup Bottle)", baseWeight: 1, unit: "Pcs", basePrice: 15, category: "Snacks" },
+            { id: 137, name: "स्वागत फरसाण १ किलो (Swad/Swagat Farsan 1kg)", baseWeight: 1, unit: "kg", basePrice: 200, category: "Snacks" },
+            { id: 237, name: "Cut Shevai (कट शेवई पॅकेट)", baseWeight: 1, unit: "Pkt", basePrice: 10, category: "Snacks" },
+
+            // --- BAKERY ---
+            { id: 238, name: "Bread (ब्रेड पॅकेट)", baseWeight: 1, unit: "Pkt", basePrice: 10, category: "Bakery" },
+            { id: 239, name: "Toast (टोस्ट पॅकेट)", baseWeight: 1, unit: "Pkt", basePrice: 12, category: "Bakery" },
+            { id: 240, name: "Makkhan Toast (माखन टोस्ट)", baseWeight: 1, unit: "Pcs", basePrice: 2, category: "Bakery" },
+            { id: 241, name: "Sugar Samosa (शुगर समोसा)", baseWeight: 1, unit: "Pcs", basePrice: 2, category: "Bakery" },
+            { id: 242, name: "Khari Samosa (खारी समोसा पॅकेट)", baseWeight: 1, unit: "Pkt", basePrice: 12, category: "Bakery" },
+            { id: 243, name: "Pistri Big (पेस्ट्री मोठी)", baseWeight: 1, unit: "Pkt", basePrice: 24, category: "Bakery" },
+            { id: 244, name: "Pistri Small (पेस्ट्री लहान)", baseWeight: 1, unit: "Pkt", basePrice: 12, category: "Bakery" },
+            { id: 245, name: "Badam Bakery Packet (बदाम बेकरी पॅकेट)", baseWeight: 1, unit: "Pkt", basePrice: 12, category: "Bakery" },
+
+            // --- DENTAL & ORAL CARE ---
+            { id: 140, name: "कोलगेट पेस्ट लहान (Colgate Paste Small)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Oral" },
+            { id: 141, name: "कोलगेट पेस्ट मध्यम (Colgate Paste Medium)", baseWeight: 1, unit: "Pcs", basePrice: 20, category: "Oral" },
+            { id: 142, name: "कोलगेट पेस्ट १०० ग्रॅम (Colgate Paste 100gm)", baseWeight: 1, unit: "Pcs", basePrice: 55, category: "Oral" },
+            { id: 143, name: "क्लोजअप पेस्ट (Closeup Paste Small)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Oral" },
+            { id: 144, name: "क्लोजअप पेस्ट (Closeup Paste Medium)", baseWeight: 1, unit: "Pcs", basePrice: 20, category: "Oral" },
+            { id: 145, name: "डाबर लाल पेस्ट (Dabur Red Paste)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Oral" },
+            { id: 146, name: "डाबर बबुल पेस्ट (Dabur Babool Paste)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Oral" },
+            { id: 147, name: "डाबर लाल दंत मंजन (Dabur Lal Dantmanjan)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Oral" },
+            { id: 148, name: "पतंजली दंत कांती (Patanjali Dant Kanti 18gm)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Oral" },
+            { id: 149, name: "पतंजली दंत कांती (Patanjali Dant Kanti 43gm)", baseWeight: 1, unit: "Pcs", basePrice: 20, category: "Oral" },
+            { id: 150, name: "पतंजली दंत कांती (Patanjali Dant Kanti 100gm)", baseWeight: 1, unit: "Pcs", basePrice: 56, category: "Oral" },
+            { id: 246, name: "Colgate Toothbrush", baseWeight: 1, unit: "Pcs", basePrice: 20, category: "Oral" },
+            { id: 247, name: "Oral-B Toothbrush (ओरल-बी)", baseWeight: 1, unit: "Pcs", basePrice: 20, category: "Oral" },
+            { id: 248, name: "Oral-B Toothbrush (ओरल-बी)", baseWeight: 1, unit: "Pcs", basePrice: 30, category: "Oral" },
+            { id: 249, name: "Oral-B Toothbrush (ओरल-बी)", baseWeight: 1, unit: "Pcs", basePrice: 55, category: "Oral" },
+            { id: 250, name: "Patanjali Toothbrush (पतंजली)", baseWeight: 1, unit: "Pcs", basePrice: 15, category: "Oral" },
+
+            // --- POOJA ITEMS ---
+            { id: 251, name: "Agarbatti (अगरबत्ती पॅकेट)", baseWeight: 1, unit: "Pcs", basePrice: 12, category: "Pooja" },
+            { id: 252, name: "Honey (मध पॅकेट)", baseWeight: 1, unit: "Pkt", basePrice: 10, category: "Pooja" },
+            { id: 253, name: "Kapoor 29m (कापूर पॅकेट)", baseWeight: 1, unit: "Pkt", basePrice: 25, category: "Pooja" },
+            { id: 254, name: "Kapoor (कापूर लहान पॅकेट)", baseWeight: 1, unit: "Pkt", basePrice: 10, category: "Pooja" },
+            { id: 255, name: "Kapoor (कापूर मिनी पॅकेट)", baseWeight: 1, unit: "Pkt", basePrice: 5, category: "Pooja" },
+            { id: 256, name: "Haldukund (हळकुंड)", baseWeight: 1, unit: "Pcs", basePrice: 2.5, category: "Pooja" },
+            { id: 257, name: "Akha Badam Pooja (अक्खा बदाम पूजा)", baseWeight: 1, unit: "Pcs", basePrice: 2.5, category: "Pooja" },
+            { id: 258, name: "Kharik Pooja (खारीक पूजा)", baseWeight: 1, unit: "Pcs", basePrice: 2.5, category: "Pooja" },
+            { id: 259, name: "Gund / Supari (सुपारी)", baseWeight: 1, unit: "Pcs", basePrice: 2.5, category: "Pooja" },
+            { id: 260, name: "Khadi Sakhar (खडी साखर)", baseWeight: 50, unit: "g", basePrice: 5, category: "Pooja" },
+            { id: 261, name: "Ganesh Kapus Vat (कापूस वात गणेश)", baseWeight: 4, unit: "Pcs", basePrice: 6, category: "Pooja" },
+            { id: 262, name: "Sada Kapus Vat (कापूस वाt साधी)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Pooja" },
+            { id: 263, name: "Divyachi Vat (दिव्याची वात)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Pooja" },
+
+            // --- STATIONARY ---
+            { id: 264, name: "Apsara Eraser (अप्सरा खोडरबर)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Stationary" },
+            { id: 265, name: "Natraj Eraser (नटराज खोडरबर)", baseWeight: 1, unit: "Pcs", basePrice: 1, category: "Stationary" },
+            { id: 266, name: "Apsara Pencil (अप्सरा पेन्सिल)", baseWeight: 1, unit: "Pcs", basePrice: 6, category: "Stationary" },
+            { id: 267, name: "Natraj Pencil (नटराज पेन्सिल)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Stationary" },
+            { id: 268, name: "Camlin Scale (कॅमलिन पट्टी)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Stationary" },
+            { id: 269, name: "Apsara Sharpener (अप्सरा टोकयंत्र)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Stationary" },
+            { id: 270, name: "Montex Ball Pen (मॉन्टेक्स पेन)", baseWeight: 1, unit: "Pcs", basePrice: 5, category: "Stationary" },
+            { id: 271, name: "Slate Pencil (पाटीची पेन्सिल पॅकेट)", baseWeight: 1, unit: "Pkt", basePrice: 10, category: "Stationary" },
+            { id: 272, name: "Chalk Box / Piece (खडू)", baseWeight: 1, unit: "Pcs", basePrice: 1, category: "Stationary" },
+
+            // --- MISC PRODUCTS ---
+            { id: 151, name: "माचीस चावी (Matchbox Chaavi)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Misc" },
+            { id: 152, name: "घड्याळ सेल (Clock Battery Cells)", baseWeight: 1, unit: "Pcs", basePrice: 20, category: "Misc" },
+            { id: 153, name: "रिमोट सेल (Remote Battery Cells)", baseWeight: 1, unit: "Pcs", basePrice: 20, category: "Misc" },
+            { id: 154, name: "रंगोळी पावडर (Rangoli Powder)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Misc" },
+            { id: 155, name: "इनो (Eno)", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Misc" },
+            { id: 273, name: "Ant Killer Powder (मुंग्यांचे पावडर)", baseWeight: 1, unit: "Pkt", basePrice: 10, category: "Misc" },
+            { id: 274, name: "GoodKnight Fast Card", baseWeight: 1, unit: "Pcs", basePrice: 10, category: "Misc" },
+            { id: 275, name: "Laxman Rekha (लक्ष्मण रेषा)", baseWeight: 1, unit: "Pcs", basePrice: 20, category: "Misc" },
+            { id: 276, name: "GoodKnight Coil Packet", baseWeight: 1, unit: "Pkt", basePrice: 45, category: "Misc" }
         ];
 
         let cart = [];
@@ -693,35 +905,27 @@
             priceEl.innerText = `₹${calculatedPrice}`;
         }
 
-        function selectCategory(category, element) {
-            currentSelectedCategory = category;
+        function filterProducts() {
+            const query = document.getElementById('search-input').value.toLowerCase().trim();
+            const filtered = products.filter(product => {
+                const matchesSearch = product.name.toLowerCase().includes(query);
+                const matchesCategory = (currentSelectedCategory === "All" || product.category === currentSelectedCategory);
+                return matchesSearch && matchesCategory;
+            });
+            loadProducts(filtered);
+        }
+
+        function filterByCategory(categoryName, element) {
+            currentSelectedCategory = categoryName;
             
-            // Toggle active classes on tabs
-            const tabs = document.querySelectorAll('.category-tab');
-            tabs.forEach(tab => tab.classList.remove('active'));
+            const buttons = document.querySelectorAll('.category-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
             element.classList.add('active');
 
-            // Update title text
-            const titleEl = document.getElementById('section-title');
-            titleEl.innerText = element.innerText;
+            const sectionTitle = document.getElementById('section-title');
+            sectionTitle.innerText = element.innerText;
 
-            applyFilters();
-        }
-
-        function filterProducts() {
-            applyFilters();
-        }
-
-        function applyFilters() {
-            const searchQuery = document.getElementById('search-input').value.toLowerCase();
-            
-            const filtered = products.filter(product => {
-                const matchesCategory = (currentSelectedCategory === 'all' || product.category === currentSelectedCategory);
-                const matchesSearch = product.name.toLowerCase().includes(searchQuery);
-                return matchesCategory && matchesSearch;
-            });
-
-            loadProducts(filtered);
+            filterProducts();
         }
 
         document.getElementById('search-input').addEventListener('keypress', function(e) {
@@ -841,7 +1045,7 @@
             });
 
             message += `\n💵 *Total Bill:* ₹${total}\n`;
-            message += `\n👍 सामान मिलने पर कैश पेमेंट कलेक्ट करें।`;
+            message += `\n👍 सामान मिलने पर कॅश पेमेंट कलेक्ट करें।`;
             message += `\n\nThank you for ordering!`;
             
             const url = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(message)}`;
