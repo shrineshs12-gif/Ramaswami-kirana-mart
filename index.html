@@ -1088,6 +1088,29 @@ if ("serviceWorker" in navigator) {
     });
 }
     </script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDarqM1k5nPFemt7oCYp3l0dz9srkBUOOQ",
+    authDomain: "ramaswami-kirana-mart.firebaseapp.com",
+    projectId: "ramaswami-kirana-mart",
+    storageBucket: "ramaswami-kirana-mart.firebasestorage.app",
+    messagingSenderId: "114940627434",
+    appId: "1:114940627434:web:08d5d85e827e03d4d24a93",
+    measurementId: "G-L3X17X3BJ1"
+  };
+
+  // Start Firebase
+  const app = initializeApp(firebaseConfig);
+  window.auth = getAuth(app);
+  window.db = getFirestore(app);
+  
+  console.log("Firebase is connected!");
+</script>
+
 </body>
 </html>
 
