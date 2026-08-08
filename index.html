@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <style>
         :root {
             --primary: #10b981;       /* Premium Fresh Green */
@@ -156,7 +156,7 @@
             padding-bottom: 10px;
             scrollbar-width: none;
         }
-        
+
         .category-container::-webkit-scrollbar {
             display: none;
         }
@@ -574,7 +574,7 @@
             <h3>Your Cart</h3>
             <span class="close-cart" onclick="toggleCart()">&times;</span>
         </div>
-        
+
         <div class="cart-items" id="cart-items"></div>
 
         <button class="clear-cart-btn" onclick="clearAllCart()">Clear Full Cart</button>
@@ -593,12 +593,16 @@
             <span>Total:</span>
             <span>₹<span id="cart-total-amount">0</span></span>
         </div>
-        
+
         <div class="error-box" id="error-box">
             ⚠️ Bill should be above ₹500 for home delivery.
         </div>
 
         <button class="checkout-btn" onclick="sendOrderToWhatsApp()">Order via WhatsApp</button>
+    </div>
+
+    <div style="text-align: center; padding: 30px; font-size: 12px;">
+        <a href="admin.html" style="color: #cbd5e1; text-decoration: none;">Admin Access</a>
     </div>
 
     <script>
@@ -610,7 +614,7 @@
             { id: 1, name: "L M तांदूळ (L M Rice)", baseWeight: 1, unit: "kg", basePrice: 68, category: "Kirana" },
 
 { id: 405, name: " चिंच (chinch tamarind)", baseWeight: 1, unit: "kg", basePrice: 68, category: "Kirana" },
-           
+
             { id: 3, name: "डॉलर तूरडाळ (Dollar Toor Dal)", baseWeight: 1, unit: "kg", basePrice: 140, category: "Kirana" },
             { id: 4, name: "मसूर डाळ (Masoor Dal)", baseWeight: 1, unit: "kg", basePrice: 100, category: "Kirana" },
             { id: 5, name: "मुगडाळ (Moong Dal)", baseWeight: 1, unit: "kg", basePrice: 128, category: "Kirana" },
@@ -860,7 +864,7 @@
             { id: 252, name: "Honey (मध पॅकेट)", baseWeight: 1, unit: "Pkt", basePrice: 10, category: "Pooja" },
             { id: 253, name: "Kapoor small (कापूर पॅकेट)", baseWeight: 1, unit: "Pkt", basePrice: 5, category: "Pooja" },
             { id: 254, name: "Kapoor big (कापूर लहान पॅकेट)", baseWeight: 1, unit: "Pkt", basePrice: 10, category: "Pooja" },
-           
+
             { id: 256, name: "Haldukund (हळकुंड)", baseWeight: 1, unit: "Pcs", basePrice: 2.5, category: "Pooja" },
             { id: 257, name: "Akha Badam Pooja (अक्खा बदाम पूजा)", baseWeight: 1, unit: "Pcs", basePrice: 2.5, category: "Pooja" },
             { id: 258, name: "Kharik Pooja (खारीक पूजा)", baseWeight: 1, unit: "Pcs", basePrice: 2.5, category: "Pooja" },
@@ -904,7 +908,7 @@
                 container.innerHTML = "<p style='grid-column: 1/-1; text-align: center; color: #888; font-weight:600; padding: 40px;'>No products found.</p>";
                 return;
             }
-            
+
             container.innerHTML = productsToShow.map(product => {
                 let unitLabel = product.unit;
                 return `
@@ -942,7 +946,7 @@
 
         function filterByCategory(categoryName, element) {
             currentSelectedCategory = categoryName;
-            
+
             const buttons = document.querySelectorAll('.category-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
             element.classList.add('active');
@@ -978,7 +982,7 @@
                 });
             }
             updateCart();
-            
+
             const cartIcon = document.querySelector('.cart-icon');
             cartIcon.style.transform = "scale(1.1)";
             setTimeout(() => cartIcon.style.transform = "scale(1)", 200);
@@ -1072,7 +1076,7 @@
             message += `\n💵 *Total Bill:* ₹${total}\n`;
             message += `\n👍 सामान मिलने पर कॅश पेमेंट कलेक्ट करें।`;
             message += `\n\nThank you for ordering!`;
-            
+
             const url = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(message)}`;
             window.open(url, '_blank');
         }
@@ -1107,10 +1111,11 @@ if ("serviceWorker" in navigator) {
   const app = initializeApp(firebaseConfig);
   window.auth = getAuth(app);
   window.db = getFirestore(app);
-  
+
   console.log("Firebase is connected!");
 </script>
 
 </body>
 </html>
+
 
