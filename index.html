@@ -918,18 +918,20 @@
                     <div class="product-card">
                         <div class="product-name">${product.name}</div>
                         <div class="weight-custom-container">
-                            <input type="number" class="weight-input" id="weight-${product.id}" value="${product.baseWeight}" min="1" oninput="updateCardPrice(${product.id})">
+                            <input type="number" class="weight-input" id="weight-${product.id}" value="${product.baseWeight}" min="1" oninput="updateCardPrice('${product.id}')">
                             <span class="weight-unit-label">${unitLabel}</span>
                         </div>
                         <div class="product-price" id="price-${product.id}">₹${product.basePrice}</div>
-                        <button class="add-btn" onclick="addToCart(${product.id})">ADD TO CART</button>
+                        <button class="add-btn" onclick="addToCart('${product.id}')">ADD TO CART</button>
                     </div>
                 `;
             }).join('');
         }
 
         function updateCardPrice(id) {
-            const product = products.find(p => p.id === id);
+            // Updated to handle both string and number IDs safely
+            const product = products.find(p => p.id == id);
+            if (!product) return;
             const inputEl = document.getElementById(`weight-${id}`);
             let currentWeight = parseFloat(inputEl.value) || 0;
             let calculatedPrice = Math.round((currentWeight / product.baseWeight) * product.basePrice);
@@ -965,7 +967,8 @@
         });
 
         function addToCart(id) {
-            const product = products.find(p => p.id === id);
+            const product = products.find(p => p.id == id);
+            if (!product) return;
             const inputEl = document.getElementById(`weight-${id}`);
             let chosenWeight = parseFloat(inputEl.value) || product.baseWeight;
             let calculatedPrice = Math.round((chosenWeight / product.baseWeight) * product.basePrice);
@@ -1084,6 +1087,8 @@
             window.open(url, '_blank');
         }
 
+        // Attach filter function globally so our Firebase script can use it
+        window.filterProducts = filterProducts;
         loadProducts();
 
 // Service Worker Register
@@ -1098,7 +1103,7 @@ if ("serviceWorker" in navigator) {
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDarqM1k5nPFemt7oCYp3l0dz9srkBUOOQ",
@@ -1116,9 +1121,45 @@ if ("serviceWorker" in navigator) {
   window.db = getFirestore(app);
 
   console.log("Firebase is connected!");
+
+  // Safely remember how many hardcoded products you have
+  if (!window.originalProductCount) {
+      window.originalProductCount = products.length;
+  }
+
+  // Check the live database for any NEW items you added in the Admin panel
+  onSnapshot(collection(window.db, "products"), (snapshot) => {
+      // Clear out old Firebase items so they don't duplicate on refresh
+      products.length = window.originalProductCount; 
+
+      snapshot.forEach((doc) => {
+          const data = doc.data();
+          
+          // Double-check to make sure we don't accidentally pull an old product you already have written in your code above
+          const alreadyExists = products.find(p => p.name === data.name);
+          
+          if(!alreadyExists) {
+              // Add the brand new product to the bottom of the list
+              products.push({
+                  id: doc.id,
+                  name: data.name,
+                  baseWeight: data.baseWeight || data.weight,
+                  unit: data.unit,
+                  basePrice: data.price,
+                  category: data.category
+              });
+          }
+      });
+      
+      // Update the screen with the combined list!
+      if (typeof window.filterProducts === "function") {
+          window.filterProducts();
+      }
+  });
 </script>
 
 </body>
 </html>
+
 
 
