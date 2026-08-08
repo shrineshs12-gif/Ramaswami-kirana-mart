@@ -4,69 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Ramaswami Kirana</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #f1f5f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .login-box {
-            background: white;
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 350px;
-            text-align: center;
-        }
-        .login-box h2 {
-            color: #10b981;
-            margin-bottom: 20px;
-        }
-        input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-family: inherit;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            background: #10b981;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover {
-            background: #059669;
-        }
-        #error-msg {
-            color: #ef4444;
-            font-size: 14px;
-            margin-top: 10px;
-            display: none;
-        }
-        #dashboard {
-            display: none;
-            text-align: center;
-        }
+        body { font-family: sans-serif; background: #f1f5f9; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        
+        /* Login Screen Styles */
+        .login-box { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; width: 100%; max-width: 350px; margin-top: 10vh; }
+        
+        /* Dashboard Styles */
+        #dashboard { display: none; width: 100%; max-width: 800px; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 20px; }
+        
+        /* Form Styles */
+        .form-group { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        input, select { flex: 1; min-width: 150px; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-family: inherit; }
+        button { padding: 12px 20px; background: #10b981; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-logout { background: #ef4444; padding: 8px 15px; }
+        
+        /* Table Styles */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #f1f5f9; }
+        th { background: #f8fafc; color: #475569; }
+        
+        #error-msg { color: red; display: none; margin-top: 10px; }
     </style>
 </head>
 <body>
 
     <div class="login-box" id="login-screen">
-        <h2>Admin Login</h2>
+        <h2 style="color: #10b981;">Admin Login</h2>
         <input type="email" id="email" placeholder="Admin Email">
         <input type="password" id="password" placeholder="Password">
         <button onclick="login()">Login</button>
@@ -74,9 +39,52 @@
     </div>
 
     <div id="dashboard">
-        <h2>Welcome to Admin Dashboard</h2>
-        <p>You are successfully logged in!</p>
-        <button onclick="logout()" style="background: #ef4444; max-width: 200px;">Logout</button>
+        <div class="header">
+            <h2 style="color: #10b981; margin: 0;">Product Manager</h2>
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+
+        <h3>Add New Product</h3>
+        <div class="form-group">
+            <input type="text" id="prod-name" placeholder="Product Name (उदा. तांदूळ)">
+            <input type="number" id="prod-price" placeholder="Price (₹)">
+        </div>
+        <div class="form-group">
+            <input type="number" id="prod-weight" placeholder="Base Weight (e.g. 1 or 50)">
+            <select id="prod-unit">
+                <option value="kg">kg</option>
+                <option value="g">g</option>
+                <option value="Pcs">Pcs</option>
+                <option value="Pkt">Pkt</option>
+            </select>
+            <select id="prod-category">
+                <option value="Kirana">Kirana</option>
+                <option value="Masala">Masala</option>
+                <option value="Suhana">Suhana</option>
+                <option value="Oils">Oils</option>
+                <option value="Snacks">Snacks</option>
+            </select>
+        </div>
+        <button style="width: 100%; margin-bottom: 30px;">Save Product</button>
+
+        <h3>Current Products</h3>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Weight/Unit</th>
+                        <th>Category</th>
+                    </tr>
+                </thead>
+                <tbody id="product-list">
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: #888;">Products will appear here soon...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script type="module">
@@ -94,13 +102,11 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-
-        // Make functions globally available to our HTML buttons
+        
         window.auth = auth;
         window.signInWithEmailAndPassword = signInWithEmailAndPassword;
         window.signOut = signOut;
 
-        // Check if user is logged in or out
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById('login-screen').style.display = 'none';
@@ -117,18 +123,13 @@
             const email = document.getElementById('email').value;
             const pass = document.getElementById('password').value;
             const errorMsg = document.getElementById('error-msg');
-            
-            window.signInWithEmailAndPassword(window.auth, email, pass)
-                .catch((error) => {
-                    errorMsg.innerText = "Invalid Email or Password!";
-                    errorMsg.style.display = 'block';
-                });
+            window.signInWithEmailAndPassword(window.auth, email, pass).catch(() => {
+                errorMsg.innerText = "Invalid Email or Password!";
+                errorMsg.style.display = 'block';
+            });
         }
-
-        function logout() {
-            window.signOut(window.auth);
-        }
+        function logout() { window.signOut(window.auth); }
     </script>
-
 </body>
 </html>
+
