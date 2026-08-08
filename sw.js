@@ -1,4 +1,4 @@
-const CACHE_NAME = "kirana-mart-v1";
+const CACHE_NAME = "Ramaswami-kirana-mart-v1";
 const urlsToCache = [
   "./",
   "./index.html",
