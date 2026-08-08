@@ -6,25 +6,16 @@
     <title>Admin - Ramaswami Kirana</title>
     <style>
         body { font-family: sans-serif; background: #f1f5f9; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
-        
-        /* Login Screen Styles */
         .login-box { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; width: 100%; max-width: 350px; margin-top: 10vh; }
-        
-        /* Dashboard Styles */
         #dashboard { display: none; width: 100%; max-width: 800px; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 20px; }
-        
-        /* Form Styles */
         .form-group { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
         input, select { flex: 1; min-width: 150px; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-family: inherit; }
         button { padding: 12px 20px; background: #10b981; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
         .btn-logout { background: #ef4444; padding: 8px 15px; }
-        
-        /* Table Styles */
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { text-align: left; padding: 12px; border-bottom: 1px solid #f1f5f9; }
         th { background: #f8fafc; color: #475569; }
-        
         #error-msg { color: red; display: none; margin-top: 10px; }
     </style>
 </head>
@@ -33,7 +24,7 @@
     <div class="login-box" id="login-screen">
         <h2 style="color: #10b981;">Admin Login</h2>
         <input type="email" id="email" placeholder="Admin Email">
-        <input type="password" id="password" placeholder="Password"></br>
+        <input type="password" id="password" placeholder="Password">
         <button onclick="login()">Login</button>
         <p id="error-msg"></p>
     </div>
@@ -63,11 +54,15 @@
                 <option value="Suhana">Suhana</option>
                 <option value="Oils">Oils</option>
                 <option value="Snacks">Snacks</option>
+                <option value="HairCare">Hair Care</option>
+                <option value="SkinCare">Skin Care</option>
+                <option value="Cleaning">Cleaning & Soaps</option>
+                <option value="Detergent">Detergent Powders</option>
             </select>
         </div>
-        <button style="width: 100%; margin-bottom: 30px;">Save Product</button>
+        <button style="width: 100%; margin-bottom: 30px;" onclick="saveProduct()">Save Product</button>
 
-        <h3>Current Products</h3>
+        <h3>Database Products</h3>
         <div style="overflow-x: auto;">
             <table>
                 <thead>
@@ -75,12 +70,12 @@
                         <th>Name</th>
                         <th>Price</th>
                         <th>Weight/Unit</th>
-                        <th>Category</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody id="product-list">
                     <tr>
-                        <td colspan="4" style="text-align: center; color: #888;">Products will appear here soon...</td>
+                        <td colspan="4" style="text-align: center; color: #888;">Loading your products... ⏳</td>
                     </tr>
                 </tbody>
             </table>
@@ -90,6 +85,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDarqM1k5nPFemt7oCYp3l0dz9srkBUOOQ",
@@ -102,34 +98,107 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
         
         window.auth = auth;
+        window.db = db;
         window.signInWithEmailAndPassword = signInWithEmailAndPassword;
         window.signOut = signOut;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.onSnapshot = onSnapshot;
+        window.deleteDoc = deleteDoc;
+        window.doc = doc;
 
+        // Check Login and Load Products
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
+                loadProducts(); 
             } else {
                 document.getElementById('login-screen').style.display = 'block';
                 document.getElementById('dashboard').style.display = 'none';
             }
         });
+
+        function loadProducts() {
+            onSnapshot(collection(db, "products"), (snapshot) => {
+                const productList = document.getElementById('product-list');
+                productList.innerHTML = ""; 
+                
+                if (snapshot.empty) {
+                    productList.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #888;">No products found in Database.</td></tr>';
+                    return;
+                }
+
+                snapshot.forEach((document) => {
+                    const data = document.data();
+                    const id = document.id;
+                    productList.innerHTML += `
+                        <tr>
+                            <td>${data.name}</td>
+                            <td>₹${data.price}</td>
+                            <td>${data.baseWeight} ${data.unit}</td>
+                            <td>
+                                <button style="background: #ef4444; padding: 5px 10px; font-size: 12px; width: auto;" onclick="deleteProduct('${id}')">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            });
+        }
     </script>
 
     <script>
         function login() {
             const email = document.getElementById('email').value;
             const pass = document.getElementById('password').value;
-            const errorMsg = document.getElementById('error-msg');
             window.signInWithEmailAndPassword(window.auth, email, pass).catch(() => {
-                errorMsg.innerText = "Invalid Email or Password!";
-                errorMsg.style.display = 'block';
+                document.getElementById('error-msg').innerText = "Invalid Email or Password!";
+                document.getElementById('error-msg').style.display = 'block';
             });
         }
-        function logout() { window.signOut(window.auth); }
+        
+        function logout() { 
+            window.signOut(window.auth); 
+        }
+
+        async function saveProduct() {
+            const name = document.getElementById('prod-name').value;
+            const price = document.getElementById('prod-price').value;
+            const weight = document.getElementById('prod-weight').value;
+            const unit = document.getElementById('prod-unit').value;
+            const category = document.getElementById('prod-category').value;
+
+            if(!name || !price || !weight) {
+                alert("Please fill all details!");
+                return;
+            }
+
+            try {
+                await window.addDoc(window.collection(window.db, "products"), {
+                    name: name,
+                    price: Number(price),
+                    baseWeight: Number(weight),
+                    unit: unit,
+                    category: category
+                });
+                alert("Product Added Successfully!");
+                
+                document.getElementById('prod-name').value = '';
+                document.getElementById('prod-price').value = '';
+                document.getElementById('prod-weight').value = '';
+            } catch (e) {
+                alert("Error: " + e.message);
+            }
+        }
+
+        async function deleteProduct(id) {
+            if(confirm("Delete this product from Live Database?")) {
+                await window.deleteDoc(window.doc(window.db, "products", id));
+            }
+        }
     </script>
 </body>
 </html>
-
