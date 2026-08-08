@@ -1,6 +1,6 @@
 {
   "name": "Ramaswami Kirana Mart",
-  "short_name": "Ramaswami Kirana Mart",
+  "short_name": "Ramaswami Kirana",
   "description": "Fresh Grocery & Kirana items at your doorstep.",
   "start_url": "./index.html",
   "display": "standalone",
