@@ -1099,8 +1099,7 @@ if ("serviceWorker" in navigator) {
             .catch((error) => console.log("Service Worker registration failed:", error));
     });
 }
-    </script>
-<script type="module">
+ <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -1115,45 +1114,35 @@ if ("serviceWorker" in navigator) {
     measurementId: "G-L3X17X3BJ1"
   };
 
-  // Start Firebase
   const app = initializeApp(firebaseConfig);
   window.auth = getAuth(app);
   window.db = getFirestore(app);
 
-  console.log("Firebase is connected!");
+  console.log("Firebase is connected to website!");
 
-  // Safely remember how many hardcoded products you have
-  if (!window.originalProductCount) {
-      window.originalProductCount = products.length;
-  }
-
-  // Check the live database for any NEW items you added in the Admin panel
+  // Seedha database se live products uthao aur screen par lagao
   onSnapshot(collection(window.db, "products"), (snapshot) => {
-      // Clear out old Firebase items so they don't duplicate on refresh
-      products.length = window.originalProductCount; 
+      // Products array ko khali karo
+      products.length = 0; 
 
       snapshot.forEach((doc) => {
           const data = doc.data();
-          
-          // Double-check to make sure we don't accidentally pull an old product you already have written in your code above
-          const alreadyExists = products.find(p => p.name === data.name);
-          
-          if(!alreadyExists) {
-              // Add the brand new product to the bottom of the list
-              products.push({
-                  id: doc.id,
-                  name: data.name,
-                  baseWeight: data.baseWeight || data.weight,
-                  unit: data.unit,
-                  basePrice: data.price,
-                  category: data.category
-              });
-          }
+
+          products.push({
+              id: doc.id,
+              name: data.name,
+              baseWeight: data.baseWeight || 1,
+              unit: data.unit,
+              basePrice: data.price, // Yeh database ka latest price uthayega!
+              category: data.category
+          });
       });
-      
-      // Update the screen with the combined list!
+
+      // Website ki screen ko turant update karo
       if (typeof window.filterProducts === "function") {
           window.filterProducts();
+      } else if (typeof loadProducts === "function") {
+          loadProducts();
       }
   });
 </script>
