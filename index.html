@@ -929,7 +929,6 @@
         }
 
         function updateCardPrice(id) {
-            // Updated to handle both string and number IDs safely
             const product = products.find(p => p.id == id);
             if (!product) return;
             const inputEl = document.getElementById(`weight-${id}`);
@@ -1087,68 +1086,57 @@
             window.open(url, '_blank');
         }
 
-        // Attach filter function globally so our Firebase script can use it
         window.filterProducts = filterProducts;
         loadProducts();
 
-// Service Worker Register
-if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./sw.js")
-            .then(() => console.log("Service Worker registered successfully"))
-            .catch((error) => console.log("Service Worker registration failed:", error));
-    });
-}
- <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-  import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        // Service Worker Register
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("./sw.js")
+                    .then(() => console.log("Service Worker registered successfully"))
+                    .catch((error) => console.log("Service Worker registration failed:", error));
+            });
+        }
+    </script>
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDarqM1k5nPFemt7oCYp3l0dz9srkBUOOQ",
-    authDomain: "ramaswami-kirana-mart.firebaseapp.com",
-    projectId: "ramaswami-kirana-mart",
-    storageBucket: "ramaswami-kirana-mart.firebasestorage.app",
-    messagingSenderId: "114940627434",
-    appId: "1:114940627434:web:08d5d85e827e03d4d24a93",
-    measurementId: "G-L3X17X3BJ1"
-  };
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  const app = initializeApp(firebaseConfig);
-  window.auth = getAuth(app);
-  window.db = getFirestore(app);
+        const firebaseConfig = {
+            apiKey: "AIzaSyDarqM1k5nPFemt7oCYp3l0dz9srkBUOOQ",
+            authDomain: "ramaswami-kirana-mart.firebaseapp.com",
+            projectId: "ramaswami-kirana-mart",
+            storageBucket: "ramaswami-kirana-mart.firebasestorage.app",
+            messagingSenderId: "114940627434",
+            appId: "1:114940627434:web:08d5d85e827e03d4d24a93",
+            measurementId: "G-L3X17X3BJ1"
+        };
 
-  console.log("Firebase is connected to website!");
+        const app = initializeApp(firebaseConfig);
+        window.auth = getAuth(app);
+        window.db = getFirestore(app);
 
-  // Seedha database se live products uthao aur screen par lagao
-  onSnapshot(collection(window.db, "products"), (snapshot) => {
-      // Products array ko khali karo
-      products.length = 0; 
+        // Ye script aapke hardcoded products ko chhedhe bina, 
+        // agar aapne Admin panel se koi price change kiya hai (jaise Sugar 50->51), 
+        // toh use turant website par live update kar degi!
+        onSnapshot(collection(window.db, "products"), (snapshot) => {
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                // Name match karke price update karega
+                const foundProduct = products.find(p => p.name.trim().toLowerCase() === data.name.trim().toLowerCase());
+                if (foundProduct && data.price) {
+                    foundProduct.basePrice = data.price;
+                }
+            });
 
-      snapshot.forEach((doc) => {
-          const data = doc.data();
-
-          products.push({
-              id: doc.id,
-              name: data.name,
-              baseWeight: data.baseWeight || 1,
-              unit: data.unit,
-              basePrice: data.price, // Yeh database ka latest price uthayega!
-              category: data.category
-          });
-      });
-
-      // Website ki screen ko turant update karo
-      if (typeof window.filterProducts === "function") {
-          window.filterProducts();
-      } else if (typeof loadProducts === "function") {
-          loadProducts();
-      }
-  });
-</script>
-
+            if (typeof window.filterProducts === "function") {
+                window.filterProducts();
+            } else if (typeof loadProducts === "function") {
+                loadProducts();
+            }
+        });
+    </script>
 </body>
 </html>
-
-
-
