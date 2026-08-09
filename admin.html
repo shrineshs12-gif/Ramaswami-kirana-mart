@@ -74,7 +74,7 @@
             <input type="text" id="admin-search" placeholder="Search product name..." onkeyup="filterAdminProducts()" style="max-width: 250px; padding: 8px 12px;">
         </div>
 
-        <div style="overflow-x: auto; max-height: 450px; overflow-y: auto;">
+        <div style="overflow-x: auto; max-height: 500px; overflow-y: auto;">
             <table>
                 <thead>
                     <tr>
@@ -110,7 +110,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        
+
         window.auth = auth;
         window.db = db;
         window.signInWithEmailAndPassword = signInWithEmailAndPassword;
@@ -149,7 +149,6 @@
             });
         }
 
-        // Global search function linked to search input
         window.filterAdminProducts = function() {
             const query = document.getElementById('admin-search').value.toLowerCase().trim();
             const filtered = allLiveProducts.filter(p => p.name.toLowerCase().includes(query));
@@ -160,13 +159,13 @@
             if (user) {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
-                
+
                 onSnapshot(collection(db, "products"), (snapshot) => {
                     allLiveProducts = [];
                     snapshot.forEach((document) => {
                         allLiveProducts.push({ id: document.id, ...document.data() });
                     });
-                    window.filterAdminProducts(); // render filtered or full list
+                    window.filterAdminProducts();
                 });
             } else {
                 document.getElementById('login-screen').style.display = 'block';
@@ -180,15 +179,15 @@
             const email = document.getElementById('email').value;
             const pass = document.getElementById('password').value;
             const errorBox = document.getElementById('error-msg');
-            
+
             errorBox.style.display = 'none'; 
-            
+
             window.signInWithEmailAndPassword(window.auth, email, pass).catch((error) => {
                 errorBox.innerText = "Login Failed: " + error.message;
                 errorBox.style.display = 'block';
             });
         }
-        
+
         function logout() { 
             window.signOut(window.auth); 
         }
@@ -224,7 +223,7 @@
 
         async function editPrice(id, currentPrice) {
             let newPrice = prompt("Enter new price (₹) for this product:", currentPrice);
-            
+
             if (newPrice !== null && newPrice.trim() !== "") {
                 newPrice = Number(newPrice);
                 if (!isNaN(newPrice) && newPrice > 0) {
